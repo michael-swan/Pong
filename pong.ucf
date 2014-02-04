@@ -1,0 +1,51 @@
+# Corresponds to XUPV2P pinout
+NET "Clock_100Mhz" LOC = "AJ15";
+NET "Clock_100Mhz" IOSTANDARD = LVCMOS25;
+NET "PIXEL_CLOCK" LOC = "H12";
+NET "PIXEL_CLOCK" IOSTANDARD = LVTTL;
+
+NET "C_SYNC" LOC = "N8";
+NET "H_SYNC" LOC = "B8";
+NET "V_SYNC" LOC = "D11";
+#NET "*_SYNC_OUT" IOSTANDARD = LVTTL;
+NET "*_SYNC" IOSTANDARD = LVTTL;
+
+NET "R<0>" LOC = "G8";
+NET "R<1>" LOC = "H9";
+NET "R<2>" LOC = "G9";
+NET "R<3>" LOC = "F9";
+NET "R<4>" LOC = "F10";
+NET "R<5>" LOC = "D7";
+NET "R<6>" LOC = "C7";
+NET "R<7>" LOC = "H10";
+
+NET "G<0>" LOC = "G10";
+NET "G<1>" LOC = "E10";
+NET "G<2>" LOC = "D10";
+NET "G<3>" LOC = "D8";
+NET "G<4>" LOC = "C8";
+NET "G<5>" LOC = "H11";
+NET "G<6>" LOC = "G11";
+NET "G<7>" LOC = "E11";
+
+NET "B<0>" LOC = "D15";
+NET "B<1>" LOC = "E15";
+NET "B<2>" LOC = "H15";
+NET "B<3>" LOC = "J15";
+NET "B<4>" LOC = "C13";
+NET "B<5>" LOC = "D13";
+NET "B<6>" LOC = "D14";
+NET "B<7>" LOC = "E14";
+NET "R*" IOSTANDARD = LVTTL;
+NET "G*" IOSTANDARD = LVTTL;
+NET "B*" IOSTANDARD = LVTTL;
+
+NET "VGA_BLANK" LOC = "A8";
+NET "VGA_BLANK" IOSTANDARD = LVTTL;
+
+NET "P1_UP" LOC = "AH4";
+NET "P1_DOWN" LOC = "AH1";
+NET "P2_UP" LOC = "AH2";
+NET "P2_DOWN" LOC = "AG3";
+NET "P*_UP" IOSTANDARD = LVTTL;
+NET "P*_DOWN" IOSTANDARD = LVTTL;
