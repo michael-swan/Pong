@@ -1,36 +1,36 @@
 `timescale 1ns / 1ps
 module Pong(
-    input Clock_100Mhz,
-	 input P1_UP,
-    input P1_DOWN,
-    input P2_UP,
-    input P2_DOWN,
-    output reg [7:0] R,
-    output reg [7:0] G,
-    output reg [7:0] B,
-	 output PIXEL_CLOCK,
-	 output V_SYNC,
-	 output H_SYNC,
-	 output C_SYNC,
-	 output VGA_BLANK
-    );
+	input Clock_100Mhz,
+	input P1_UP,
+	input P1_DOWN,
+	input P2_UP,
+	input P2_DOWN,
+	output reg [7:0] R,
+	output reg [7:0] G,
+	output reg [7:0] B,
+	output PIXEL_CLOCK,
+	output V_SYNC,
+	output H_SYNC,
+	output C_SYNC,
+	output VGA_BLANK
+	);
 	// Counters to track the state of the raster beam
 	wire [8:0] H_COUNTER;
 	wire [8:0] V_COUNTER;
 	
 	VideoSync signals(
 		// Inputs
-			Clock_100Mhz,
+		Clock_100Mhz,
 		// Output to the DAC
-			PIXEL_CLOCK,
-			V_SYNC,
-			H_SYNC,
-			C_SYNC,
-			VGA_BLANK,
+		PIXEL_CLOCK,
+		V_SYNC,
+		H_SYNC,
+		C_SYNC,
+		VGA_BLANK,
 		// Relevant to this module
-			H_COUNTER,
-			V_COUNTER);
-	
+		H_COUNTER,
+		V_COUNTER);
+
 	// Screen parameters
 	parameter SCREEN_TOP = 35;
 	parameter SCREEN_BOTTOM = 245;
@@ -49,13 +49,7 @@ module Pong(
 	reg [9:0] PADDLE_2_X;
 	reg [9:0] PADDLE_2_Y;
 	reg [1:0] PADDLE_2_FRAME [9:0];
-		
-	//reg [7:0] P1_Y = 115; // Replaced with PADDLE_1_Y
-	//reg [15:0] P1_PADDLE_Y = 0; // Replaced with PADDLE_1_FRAME
-	//reg [7:0] P2_Y = 115; // Replaced with PADDLE_2_Y
-	//reg [15:0] P2_PADDLE_Y = 0; // Replaced with PADDLE_2_FRAME
-	//reg [19:0] CLOCK_CYCLES_PER_PIXEL = 2^20 - 1;
-	
+
 	reg [1:0] DIRECTION;
 	reg [9:0] BALL_X;
 	reg [9:0] BALL_Y;
@@ -88,17 +82,17 @@ module Pong(
 	wire GOAL_MADE = BALL_X <= 30 || BALL_X >= 390; 
 	
 	// Raster beam booleans
-		assign BEAM_ON_LEFT_PADDLE_HORIZONTALLY = H_COUNTER >= PADDLE_1_LEFT && H_COUNTER <= PADDLE_1_RIGHT;
-		assign BEAM_ON_RIGHT_PADDLE_HORIZONTALLY = H_COUNTER >= PADDLE_2_LEFT && H_COUNTER <= PADDLE_2_RIGHT;
-		assign BEAM_ON_LEFT_PADDLE_VERTICALLY = V_COUNTER >= PADDLE_1_TOP && V_COUNTER <= PADDLE_1_BOTTOM;
-		assign BEAM_ON_RIGHT_PADDLE_VERTICALLY = V_COUNTER >= PADDLE_2_TOP && V_COUNTER <= PADDLE_2_BOTTOM;
-		assign BEAM_ON_LEFT_PADDLE = BEAM_ON_LEFT_PADDLE_HORIZONTALLY && BEAM_ON_LEFT_PADDLE_VERTICALLY;
-		assign BEAM_ON_RIGHT_PADDLE = BEAM_ON_RIGHT_PADDLE_HORIZONTALLY && BEAM_ON_RIGHT_PADDLE_VERTICALLY;
-		assign BEAM_ON_PADDLE = BEAM_ON_LEFT_PADDLE || BEAM_ON_RIGHT_PADDLE;
-		
-		assign BEAM_ON_BALL = H_COUNTER >= BALL_LEFT && H_COUNTER <= BALL_RIGHT &&
-									V_COUNTER >= BALL_TOP && V_COUNTER <= BALL_BOTTOM;
+	assign BEAM_ON_LEFT_PADDLE_HORIZONTALLY = H_COUNTER >= PADDLE_1_LEFT && H_COUNTER <= PADDLE_1_RIGHT;
+	assign BEAM_ON_RIGHT_PADDLE_HORIZONTALLY = H_COUNTER >= PADDLE_2_LEFT && H_COUNTER <= PADDLE_2_RIGHT;
+	assign BEAM_ON_LEFT_PADDLE_VERTICALLY = V_COUNTER >= PADDLE_1_TOP && V_COUNTER <= PADDLE_1_BOTTOM;
+	assign BEAM_ON_RIGHT_PADDLE_VERTICALLY = V_COUNTER >= PADDLE_2_TOP && V_COUNTER <= PADDLE_2_BOTTOM;
+	assign BEAM_ON_LEFT_PADDLE = BEAM_ON_LEFT_PADDLE_HORIZONTALLY && BEAM_ON_LEFT_PADDLE_VERTICALLY;
+	assign BEAM_ON_RIGHT_PADDLE = BEAM_ON_RIGHT_PADDLE_HORIZONTALLY && BEAM_ON_RIGHT_PADDLE_VERTICALLY;
+	assign BEAM_ON_PADDLE = BEAM_ON_LEFT_PADDLE || BEAM_ON_RIGHT_PADDLE;
 	
+	assign BEAM_ON_BALL = H_COUNTER >= BALL_LEFT && H_COUNTER <= BALL_RIGHT &&
+						  V_COUNTER >= BALL_TOP && V_COUNTER <= BALL_BOTTOM;
+
 	// Initialize registers.
 	initial begin
 		// Paddle positions
@@ -134,32 +128,14 @@ module Pong(
 		// Handle paddle collisions: ball deflects horizontally and vertically
 		if(BALL_HIT_PADDLE) begin
 			DIRECTION <= DIRECTION + 2;
-			//BALL_X <= PADDLE_1_RIGHT + 1;
 		end
-		
-		// TODO: Avoid ball from getting stuck in a wall.
-		// ...
 		
 		// Handle ball going off screen on the sides: player score change and ball returns to center
 		if(GOAL_MADE) begin
-			// TODO: SCORE.
 			BALL_X <= 180;
 			BALL_Y <= 150;
 			DIRECTION[1] <= !DIRECTION[1];
-			// winner = DIRECTION[1]; 1 = PLAYER 1, 0 = PLAYER 2
 		end
-		
-		// TORE: Capture paddle frames
-		/*if(V_COUNTER >= P1_Y - 4 && P1_PADDLE_Y == 0) begin
-			
-			P1_PADDLE_Y[15:8] <= P1_Y;
-			P1_PADDLE_Y[7:0]	<= P1_Y + PADDLE_HEIGHT;
-		end
-		if(V_COUNTER >= P2_Y - 4 && P2_PADDLE_Y == 0) begin
-			P2_PADDLE_Y[15:8] <= P2_Y;
-			P2_PADDLE_Y[7:0] <= P2_Y + PADDLE_HEIGHT;
-		end*/
-
 		// Display the paddles and ball
 		if(BEAM_ON_PADDLE || BEAM_ON_BALL) begin
 			R <= 255; G <= 255; B <= 255;
@@ -179,31 +155,21 @@ module Pong(
 				BALL_Y <= BALL_Y + 1;
 			clock_counter <= 0;
 		end else clock_counter <= clock_counter + 1;
-		//PADDLE_1_FRAME[0] <= 0;
-		//PADDLE_2_FRAME[0] <= 0;
 	end
 	
 	// Generate lower clock signals. //
-	/*reg [22:0] clock_counter = 0;*/
 	wire Clock_48Hz = clock_counter[18];
-	//wire Clock_12Hz = clock_counter[22];
-	
-	/*always @(posedge Clock_100Mhz) begin
-		clock_counter <= clock_counter + 1;
-	end*/
-	//always @(negedge V_SYNC) begin
-		//PADDLE_1_Y <= PADDLE_1_FRAME[0];
-		//PADDLE_2_Y <= PADDLE_2_FRAME[0];
-	//end
-	// TORE: Reset paddle frames
-	//always @(posedge V_SYNC) begin
-	//end
+
 	// Check paddle movement buttons at 48Hz
 	always @(posedge clock_counter[14]) 
 	begin
-		if(!P1_UP && PADDLE_1_TOP > SCREEN_TOP) 					PADDLE_1_Y <= PADDLE_1_Y - 1;
-		else if(!P1_DOWN && PADDLE_1_BOTTOM < SCREEN_BOTTOM) 	PADDLE_1_Y <= PADDLE_1_Y + 1;
-		if(!P2_UP && PADDLE_2_TOP > SCREEN_TOP) 					PADDLE_2_Y <= PADDLE_2_Y - 1;
-		else if(!P2_DOWN && PADDLE_2_BOTTOM < SCREEN_BOTTOM) 	PADDLE_2_Y <= PADDLE_2_Y + 1;
+		if(!P1_UP && PADDLE_1_TOP > SCREEN_TOP)
+			PADDLE_1_Y <= PADDLE_1_Y - 1;
+		else if(!P1_DOWN && PADDLE_1_BOTTOM < SCREEN_BOTTOM)
+			PADDLE_1_Y <= PADDLE_1_Y + 1;
+		if(!P2_UP && PADDLE_2_TOP > SCREEN_TOP)
+			PADDLE_2_Y <= PADDLE_2_Y - 1;
+		else if(!P2_DOWN && PADDLE_2_BOTTOM < SCREEN_BOTTOM)
+			PADDLE_2_Y <= PADDLE_2_Y + 1;
 	end
 endmodule
